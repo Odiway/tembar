@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model StockItem {
+  id           String   @id @default(cuid())
+  location     String
+  name         String
+  serialNumber String
+  quantity     Int
+  projectName  String
+  projectNumber String
+  deliveryTime DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  image        String?
+  
+  @@map("stock_items")
+}
