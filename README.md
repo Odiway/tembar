@@ -147,13 +147,46 @@ npx prisma migrate reset
 
 ## 🚀 Deployment
 
-### Vercel'e Deploy
-1. Vercel hesabı oluşturun
-2. Repository'yi bağlayın
-3. Environment variables ekleyin
-4. Deploy edin
+### Vercel + Neon PostgreSQL Deployment
 
-**Not**: Production'da PostgreSQL kullanımı önerilir.
+#### 1. Create Neon Database
+1. Go to [Neon.tech](https://neon.tech)
+2. Sign up and create a new project
+3. Copy your connection string (looks like: `postgresql://username:password@hostname/dbname?sslmode=require`)
+
+#### 2. Deploy to Vercel
+1. Go to [Vercel.com](https://vercel.com) and sign up
+2. Click "New Project"
+3. Import your GitHub repository: `Odiway/tembar`
+4. Add Environment Variables:
+   - `DATABASE_URL`: Your Neon PostgreSQL connection string
+5. Click "Deploy"
+
+#### 3. Run Database Migration
+After deployment, run this command in Vercel's terminal or locally:
+```bash
+npx prisma migrate deploy
+```
+
+### Local Development with PostgreSQL
+```bash
+# Install dependencies
+npm install
+
+# Set up your .env file with Neon connection string
+DATABASE_URL="your-neon-connection-string"
+
+# Run migration
+npx prisma migrate dev
+
+# Start development server
+npm run dev
+```
+
+**Database Options:**
+- **Local Development**: SQLite (default)
+- **Production**: PostgreSQL (Neon DB)
+- **Hybrid**: Use both - SQLite locally, PostgreSQL in production
 
 ## 🛠️ Geliştirme
 
