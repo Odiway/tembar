@@ -50,7 +50,8 @@ export default function Home() {
       setShowForm(false)
       setError(null)
     } catch (err) {
-      setError('Kaydetme sırasında hata oluştu')
+      const errorMessage = err instanceof Error ? err.message : 'Kaydetme sırasında hata oluştu'
+      setError(errorMessage)
       console.error('Error saving item:', err)
     } finally {
       setLoading(false)

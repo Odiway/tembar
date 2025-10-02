@@ -21,7 +21,9 @@ export class StockService {
     })
     
     if (!response.ok) {
-      throw new Error('Failed to create stock item')
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+      console.error('API Error:', errorData)
+      throw new Error(errorData.error || errorData.details || 'Failed to create stock item')
     }
     
     return response.json()
