@@ -78,8 +78,9 @@ export default function StockList({ items, onEdit, onDelete }: StockListProps) {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('tr-TR')
+  const formatDate = (dateValue: string | Date) => {
+    const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue
+    return date.toLocaleString('tr-TR')
   }
 
   const confirmDelete = (item: StockItem) => {

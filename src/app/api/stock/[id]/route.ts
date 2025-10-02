@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET specific stock item
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const item = await prisma.stockItem.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!item) {
@@ -31,14 +32,15 @@ export async function GET(
 // PUT update stock item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { location, name, serialNumber, quantity, projectName, projectNumber, deliveryTime, image } = body
 
     const item = await prisma.stockItem.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         location,
         name,
@@ -64,11 +66,12 @@ export async function PUT(
 // DELETE stock item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.stockItem.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Stock item deleted successfully' })
