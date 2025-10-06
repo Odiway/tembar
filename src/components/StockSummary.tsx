@@ -43,60 +43,72 @@ export default function StockSummary({ items }: StockSummaryProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       {/* Location Summary */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
-          📍 Konumlara Göre Dağılım
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+          <span className="mr-3">📍</span>
+          Konumlara Göre Dağılım
         </h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Object.entries(locationBreakdown)
             .sort(([,a], [,b]) => b.count - a.count)
             .map(([location, data]) => (
-              <div key={location} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">{location}</div>
-                  <div className="text-sm text-gray-600">
-                    {data.items.length} farklı ürün
+              <div key={location} className="group hover:bg-gray-50 p-4 rounded-lg border border-gray-100 transition-all duration-200">
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {location}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      📦 {data.items.length} farklı ürün
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-blue-600">{data.count}</div>
-                  <div className="text-sm text-gray-500">adet</div>
+                  <div className="text-right ml-4">
+                    <div className="text-2xl font-bold text-blue-600">{data.count}</div>
+                    <div className="text-sm text-gray-500">adet</div>
+                  </div>
                 </div>
               </div>
             ))}
         </div>
         {Object.keys(locationBreakdown).length === 0 && (
-          <div className="text-center text-gray-500 py-4">
+          <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+            <span className="text-4xl mb-4 block">📍</span>
             Henüz konum verisi bulunmuyor
           </div>
         )}
       </div>
 
       {/* Project Summary */}
-      <div className="bg-white rounded-lg shadow-md p-4">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
-          📋 Projelere Göre Dağılım
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+        <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+          <span className="mr-3">🏗️</span>
+          Projelere Göre Dağılım
         </h3>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {Object.entries(projectBreakdown)
             .sort(([,a], [,b]) => b.count - a.count)
             .map(([project, data]) => (
-              <div key={project} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                <div>
-                  <div className="font-medium text-gray-900">{project}</div>
-                  <div className="text-sm text-gray-600">
-                    {data.items.length} farklı ürün
+              <div key={project} className="group hover:bg-gray-50 p-4 rounded-lg border border-gray-100 transition-all duration-200">
+                <div className="flex justify-between items-center">
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                      {project}
+                    </div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      📦 {data.items.length} farklı ürün
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-green-600">{data.count}</div>
-                  <div className="text-sm text-gray-500">adet</div>
+                  <div className="text-right ml-4">
+                    <div className="text-2xl font-bold text-green-600">{data.count}</div>
+                    <div className="text-sm text-gray-500">adet</div>
+                  </div>
                 </div>
               </div>
             ))}
         </div>
         {Object.keys(projectBreakdown).length === 0 && (
-          <div className="text-center text-gray-500 py-4">
+          <div className="text-center text-gray-500 py-8 bg-gray-50 rounded-lg">
+            <span className="text-4xl mb-4 block">🏗️</span>
             Henüz proje verisi bulunmuyor
           </div>
         )}

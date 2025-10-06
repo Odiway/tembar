@@ -105,54 +105,57 @@ export default function HistoryList({ onClose }: HistoryListProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              📋 Stok Geçmişi
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+        <div className="bg-gradient-to-r from-orange-600 to-orange-700 px-6 py-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold text-white flex items-center">
+              <span className="mr-3">📋</span>
+              Stok Geçmişi
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+              className="text-white hover:text-orange-200 text-2xl transition-colors"
             >
               ✕
             </button>
           </div>
+        </div>
 
+        <div className="p-6 border-b border-gray-200">
           {/* Filters */}
-          <div className="flex gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                İşlem Türü
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                📊 İşlem Türü
               </label>
               <select
                 value={filter.action}
                 onChange={(e) => setFilter(prev => ({ ...prev, action: e.target.value as HistoryAction | '' }))}
-                className="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
               >
-                <option value="">Tümü</option>
-                <option value="CREATE">Eklenen</option>
-                <option value="UPDATE">Güncellenen</option>
-                <option value="DELETE">Silinen</option>
-                <option value="QUANTITY_CHANGE">Miktar Değişen</option>
+                <option value="">🌟 Tümü</option>
+                <option value="CREATE">✅ Eklenen</option>
+                <option value="UPDATE">✏️ Güncellenen</option>
+                <option value="DELETE">❌ Silinen</option>
+                <option value="QUANTITY_CHANGE">📊 Miktar Değişen</option>
               </select>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Zaman Aralığı
+            <div className="space-y-2">
+              <label className="block text-sm font-semibold text-gray-700">
+                📅 Zaman Aralığı
               </label>
               <select
                 value={filter.days}
                 onChange={(e) => setFilter(prev => ({ ...prev, days: e.target.value }))}
-                className="p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 hover:bg-white transition-all duration-200"
               >
-                <option value="1">Son 1 gün</option>
-                <option value="7">Son 7 gün</option>
-                <option value="30">Son 30 gün</option>
-                <option value="90">Son 90 gün</option>
-                <option value="">Tüm zamanlar</option>
+                <option value="1">📅 Son 1 gün</option>
+                <option value="7">📅 Son 7 gün</option>
+                <option value="30">📅 Son 30 gün</option>
+                <option value="90">📅 Son 90 gün</option>
+                <option value="">🕒 Tüm zamanlar</option>
               </select>
             </div>
           </div>
