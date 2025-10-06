@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { StockItem, CreateStockItem } from '@/types/stock'
 
 interface StockFormProps {
@@ -23,6 +23,11 @@ export default function StockForm({ item, onSave, onCancel }: StockFormProps) {
     image: item?.image || ''
   })
 
+  const [showCamera, setShowCamera] = useState(false)
+  const [stream, setStream] = useState<MediaStream | null>(null)
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -35,13 +40,83 @@ export default function StockForm({ item, onSave, onCancel }: StockFormProps) {
     }
   }
 
+  const startCamera = async () => {
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'environment' // Use back camera on mobile
+        } 
+      })
+      setStream(mediaStream)
+      setShowCamera(true)
+      
+      // Set video source after a short delay to ensure video element is rendered
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream
+        }
+      }, 100)
+    } catch (err) {
+      console.error('Error accessing camera:', err)
+      alert('Kameraya erişim sağlanamadı. Lütfen tarayıcı izinlerini kontrol edin.')
+    }
+  }
+
+  const stopCamera = () => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop())
+      setStream(null)
+    }
+    setShowCamera(false)
+  }
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current
+      const canvas = canvasRef.current
+      const context = canvas.getContext('2d')
+      
+      // Set canvas size to video size
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      
+      // Draw video frame to canvas
+      context?.drawImage(video, 0, 0, canvas.width, canvas.height)
+      
+      // Convert canvas to base64 image
+      const imageData = canvas.toDataURL('image/jpeg', 0.8)
+      setFormData(prev => ({ ...prev, image: imageData }))
+      
+      // Stop camera
+      stopCamera()
+    }
+  }
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image: '' }))
+  }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    // Stop camera if it's running
+    if (stream) {
+      stopCamera()
+    }
     onSave({
       ...formData,
       deliveryTime: formData.deliveryTime, // Ensure it's a string
       image: formData.image || undefined
     })
+  }
+
+  const handleCancel = () => {
+    // Stop camera if it's running
+    if (stream) {
+      stopCamera()
+    }
+    onCancel()
   }
 
   return (
@@ -159,24 +234,84 @@ export default function StockForm({ item, onSave, onCancel }: StockFormProps) {
                 <label className="block text-sm font-semibold text-gray-700">
                   📸 Ürün Fotoğrafı
                 </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                />
+                
+                {!showCamera ? (
+                  <div className="space-y-3">
+                    {/* File Upload */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    
+                    {/* Camera Button */}
+                    <button
+                      type="button"
+                      onClick={startCamera}
+                      className="w-full inline-flex items-center justify-center px-4 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-200 transition-all duration-200 shadow-md hover:shadow-lg"
+                    >
+                      <span className="mr-2">📷</span>
+                      Fotoğraf Çek
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {/* Camera View */}
+                    <div className="relative bg-gray-900 rounded-lg overflow-hidden">
+                      <video
+                        ref={videoRef}
+                        autoPlay
+                        playsInline
+                        className="w-full h-64 object-cover"
+                      />
+                      <div className="absolute inset-0 border-2 border-dashed border-white/30 rounded-lg pointer-events-none"></div>
+                    </div>
+                    
+                    {/* Camera Controls */}
+                    <div className="flex gap-3">
+                      <button
+                        type="button"
+                        onClick={capturePhoto}
+                        className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-200 transition-all duration-200 shadow-md hover:shadow-lg"
+                      >
+                        <span className="mr-2">📸</span>
+                        Fotoğrafı Çek
+                      </button>
+                      <button
+                        type="button"
+                        onClick={stopCamera}
+                        className="px-4 py-3 bg-gray-600 text-white font-medium rounded-lg hover:bg-gray-700 focus:ring-4 focus:ring-gray-200 transition-all duration-200 shadow-md hover:shadow-lg"
+                      >
+                        ❌ İptal
+                      </button>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Hidden canvas for photo capture */}
+                <canvas ref={canvasRef} style={{ display: 'none' }} />
               </div>
             </div>
 
             {formData.image && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  🖼️ Ürün Önizleme
-                </label>
+                <div className="flex justify-between items-center mb-2">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    🖼️ Ürün Önizleme
+                  </label>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors"
+                  >
+                    🗑️ Fotoğrafı Sil
+                  </button>
+                </div>
                 <img
                   src={formData.image}
                   alt="Ürün önizleme"
-                  className="w-32 h-32 object-cover rounded-lg border-2 border-gray-200 shadow-md"
+                  className="w-48 h-48 object-cover rounded-lg border-2 border-gray-200 shadow-md"
                 />
               </div>
             )}
@@ -186,7 +321,7 @@ export default function StockForm({ item, onSave, onCancel }: StockFormProps) {
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex gap-3 justify-end">
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="px-6 py-2.5 bg-gray-500 text-white font-medium rounded-lg hover:bg-gray-600 focus:ring-4 focus:ring-gray-200 transition-all duration-200"
           >
             İptal
