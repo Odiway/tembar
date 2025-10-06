@@ -101,15 +101,19 @@ export class HistoryService {
       where.createdAt = {}
       if (filters.startDate) {
         where.createdAt.gte = filters.startDate
+        console.log('History filter startDate (gte):', filters.startDate.toISOString())
       }
       if (filters.endDate) {
         where.createdAt.lte = filters.endDate
+        console.log('History filter endDate (lte):', filters.endDate.toISOString())
       }
     }
 
     if (filters?.stockItemId) {
       where.stockItemId = filters.stockItemId
     }
+
+    console.log('History query where clause:', JSON.stringify(where, null, 2))
 
     const entries = await prisma.stockHistory.findMany({
       where,
@@ -127,6 +131,12 @@ export class HistoryService {
       },
       take: filters?.limit || 100
     })
+
+    console.log(`Found ${entries.length} history entries`)
+    if (entries.length > 0) {
+      console.log('First entry createdAt:', entries[0].createdAt.toISOString())
+      console.log('Last entry createdAt:', entries[entries.length - 1].createdAt.toISOString())
+    }
 
     return entries.map(entry => ({
       ...entry,

@@ -34,6 +34,16 @@ export default function HistoryList({ onClose }: HistoryListProps) {
         const startDate = new Date()
         startDate.setDate(startDate.getDate() - parseInt(filter.days))
         
+        // Set time to beginning of start date and end of end date to be more inclusive
+        startDate.setHours(0, 0, 0, 0)
+        endDate.setHours(23, 59, 59, 999)
+        
+        console.log('Client filtering with dates:', {
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+          days: filter.days
+        })
+        
         params.append('startDate', startDate.toISOString())
         params.append('endDate', endDate.toISOString())
       }
