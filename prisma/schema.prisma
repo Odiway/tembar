@@ -23,5 +23,24 @@ model StockItem {
   updatedAt    DateTime @updatedAt
   image        String?
   
+  // Relations
+  historyEntries StockHistory[]
+  
   @@map("stock_items")
+}
+
+model StockHistory {
+  id           String   @id @default(cuid())
+  stockItemId  String
+  action       String   // CREATE, UPDATE, DELETE, QUANTITY_CHANGE
+  oldValues    String?  // JSON string of old values
+  newValues    String?  // JSON string of new values
+  quantityChange Int?   // +100, -50, etc.
+  reason       String?  // Optional reason for the change
+  createdAt    DateTime @default(now())
+  
+  // Relations
+  stockItem    StockItem @relation(fields: [stockItemId], references: [id], onDelete: Cascade)
+  
+  @@map("stock_history")
 }

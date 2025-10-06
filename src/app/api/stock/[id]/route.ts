@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { HistoryService } from '@/lib/historyService'
 
 // GET specific stock item
 export async function GET(
@@ -39,19 +40,34 @@ export async function PUT(
     const body = await request.json()
     const { location, name, serialNumber, quantity, projectName, projectNumber, deliveryTime, image } = body
 
+    // Get the old item first for history logging
+    const oldItem = await prisma.stockItem.findUnique({
+      where: { id }
+    })
+
+    if (!oldItem) {
+      return NextResponse.json(
+        { error: 'Stock item not found' },
+        { status: 404 }
+      )
+    }
+
     const item = await prisma.stockItem.update({
       where: { id },
       data: {
-        location,
-        name,
-        serialNumber,
+        location: location.trim(),
+        name: name.trim(),
+        serialNumber: serialNumber.trim(),
         quantity: parseInt(quantity),
-        projectName,
-        projectNumber,
+        projectName: projectName.trim(),
+        projectNumber: projectNumber.trim(),
         deliveryTime: new Date(deliveryTime),
-        image
+        image: image || null
       }
     })
+
+    // Log the update in history
+    await HistoryService.logUpdate(oldItem, item)
 
     return NextResponse.json(item)
   } catch (error) {
@@ -70,6 +86,22 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params
+    
+    // Get the item first for history logging
+    const item = await prisma.stockItem.findUnique({
+      where: { id }
+    })
+
+    if (!item) {
+      return NextResponse.json(
+        { error: 'Stock item not found' },
+        { status: 404 }
+      )
+    }
+
+    // Log the deletion in history before deleting
+    await HistoryService.logDelete(item)
+
     await prisma.stockItem.delete({
       where: { id }
     })

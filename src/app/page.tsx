@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import StockList from '@/components/StockList'
 import StockForm from '@/components/StockForm'
 import StockSummary from '@/components/StockSummary'
+import HistoryList from '@/components/HistoryList'
 import { StockItem, CreateStockItem } from '@/types/stock'
 import { StockService } from '@/lib/stockService'
 
@@ -12,6 +13,7 @@ export default function Home() {
   const [editingItem, setEditingItem] = useState<StockItem | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [showSummary, setShowSummary] = useState(true)
+  const [showHistory, setShowHistory] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -139,6 +141,12 @@ export default function Home() {
               📊 İstatistikler {showSummary ? '▲' : '▼'}
             </button>
             <button
+              onClick={() => setShowHistory(true)}
+              className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+            >
+              📋 Geçmiş
+            </button>
+            <button
               onClick={loadItems}
               disabled={loading}
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
@@ -176,6 +184,11 @@ export default function Home() {
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
+
+        {/* History Modal */}
+        {showHistory && (
+          <HistoryList onClose={() => setShowHistory(false)} />
+        )}
       </div>
     </main>
   )

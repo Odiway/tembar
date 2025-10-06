@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { HistoryService } from '@/lib/historyService'
 
 // GET all stock items
 export async function GET() {
@@ -73,6 +74,9 @@ export async function POST(request: NextRequest) {
         image: image || null
       }
     })
+
+    // Log the creation in history
+    await HistoryService.logCreate(item)
 
     return NextResponse.json(item)
   } catch (error) {
